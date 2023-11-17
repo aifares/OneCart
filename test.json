@@ -1,0 +1,25 @@
+{
+  "carts": [
+    {
+      "retailer": "nike",
+      "subTotal": "",
+      "tax": 23.99,
+      "cartTotal": "10000",
+      "lastUpdated": "9/12/21",
+      "createdAt": "9/10/20",
+      "items": [
+        {
+          "itemType": "shirt",
+          "sku": "1234",
+          "image": "image/.png",
+          "itemName": "Nike Dri-Fit",
+          "price": "24.99",
+          "qty": "1",
+          "size": "M",
+          "color": "red",
+          "productID": "1234"
+        }
+      ]
+    }
+  ]
+}
