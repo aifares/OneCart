@@ -6,6 +6,12 @@
 body {
   font-family: "Lato", sans-serif;
 }
+.contentWrapper {
+  width: 100%;
+  z-index: 50;
+  margin: 0 auto;
+  max-width: 1025px;
+}
 
 /* :root {
   --foreground-rgb: 0, 0, 0;

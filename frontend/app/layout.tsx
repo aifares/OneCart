@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        {children}
+        <section className="contentWrapper">{children}</section>
       </body>
     </html>
   );
