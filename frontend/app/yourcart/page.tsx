@@ -29,13 +29,13 @@ const Page = () => {
             </div>
 
             <div className="flex flex-col gap-5">
-              <button className="w-2/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+              <button className="w-2/3 bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded-full">
                 Share Cart
               </button>
-              <button className="w-2/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+              <button className="w-2/3 bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded-full">
                 Edit Cart
               </button>
-              <button className="w-2/3 bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+              <button className="w-2/3 bg-red-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded-full">
                 {" "}
                 Delete Cart
               </button>
