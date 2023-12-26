@@ -21,7 +21,11 @@ export default function RootLayout({
       <body>
         <SessionProvider>
           <Navbar />
-          <section className="contentWrapper">{children}</section>
+          <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+            rel="stylesheet"
+          />
+          <section className="p-4 sm:ml-64">{children}</section>
         </SessionProvider>
       </body>
     </html>
