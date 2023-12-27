@@ -1,20 +1,51 @@
-// FlightBooking.js
 "use client";
 // FlightBooking.js
-
+import useSWR from "swr";
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { create } from "domain";
+
+const fetcher = (...args) => fetch(...args).then((res) => res.text());
+function getData(url) {
+  const { data, error } = useSWR("url", fetcher);
+  return {
+    data: data,
+    error: error,
+  };
+}
+
+const createApiUrl = ({
+  originCity,
+  destinationCity,
+  departureDate,
+  returnDate,
+}) => {
+  const baseUrl = "http://localhost:9000/api/v1/";
+
+  // Constructing the URL with query parameters
+  const apiUrl = `${baseUrl}?originCity=${originCity}&destinationCity=${destinationCity}&departureDate=${departureDate}&returnDate=${returnDate}`;
+
+  return apiUrl;
+};
 
 const FlightBooking = () => {
+  const [shouldFetch, setShouldFetch] = React.useState(false);
   const [tripType, setTripType] = useState("oneWay");
   const [cabinClass, setCabinClass] = useState("economy");
   const [numAdults, setNumAdults] = useState(1);
   const [numChildren, setNumChildren] = useState(0);
   const [originCity, setOriginCity] = useState("");
   const [destinationCity, setDestinationCity] = useState("");
-  const [departureDate, setDepartureDate] = useState(new Date());
-  const [returnDate, setReturnDate] = useState(new Date());
+  const [departureDate, setDepartureDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+  const endpointURL = createApiUrl({
+    originCity,
+    destinationCity,
+    departureDate,
+    returnDate,
+  });
+  const { data } = useSWR(shouldFetch ? endpointURL : null, fetcher);
 
   const handleTripTypeChange = (e) => {
     setTripType(e.target.value);
@@ -41,26 +72,28 @@ const FlightBooking = () => {
   };
 
   const handleDepartureDateChange = (date) => {
-    setDepartureDate(date);
+    const formattedDate = date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    setDepartureDate(formattedDate);
   };
 
   const handleReturnDateChange = (date) => {
-    setReturnDate(date);
+    // Format the selected date as "MM/dd/yyyy"
+    const formattedDate = date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    setReturnDate(formattedDate);
   };
 
   const handleSearchFlight = () => {
-    const searchData = {
-      tripType,
-      cabinClass,
-      numAdults,
-      numChildren,
-      originCity,
-      destinationCity,
-      departureDate,
-      returnDate,
-    };
-    console.log("Search Flight:", searchData);
-    // In a real application, you would perform the actual search or trigger an action here.
+    setShouldFetch(true);
   };
 
   return (
@@ -178,7 +211,7 @@ const FlightBooking = () => {
             Departure Date
           </label>
           <DatePicker
-            selected={departureDate}
+            selected={departureDate ? new Date(departureDate) : null}
             onChange={handleDepartureDateChange}
             dateFormat="MM/dd/yyyy"
             className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
@@ -192,7 +225,7 @@ const FlightBooking = () => {
             Return Date
           </label>
           <DatePicker
-            selected={returnDate}
+            selected={returnDate ? new Date(returnDate) : null}
             onChange={handleReturnDateChange}
             dateFormat="MM/dd/yyyy"
             className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
@@ -337,6 +370,7 @@ const FlightBooking = () => {
           </a>
         </div>
       </label>
+      <div>{!data ? "walled eats butt" : data}</div>
     </div>
   );
 };
