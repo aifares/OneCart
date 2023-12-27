@@ -6,60 +6,55 @@ const duffel = new Duffel({
   token: "duffel_test_PTGHpqlDC118HrhOMGnPDNRU-DVCwLZFuqriClIn1i9",
 });
 
+const convertDateFormat = (inputDate) => {
+  // Split the input date into components
+  const [month, day, year] = inputDate.split("/");
+
+  // Format the date in the desired output format
+  const outputDate = `${year}-${month}-${day}`;
+
+  return outputDate;
+};
+
 // Route for Save a new Book
 router.get("/", async (request, response) => {
-  const res = [];
+  const { originCity, destinationCity, departureDate, returnDate } =
+    request.query;
+
   const apiRes = await duffel.offerRequests.create({
     slices: [
       {
-        origin: "JFK",
-        destination: "SDQ",
-        departure_date: "2023-12-28",
+        origin: originCity,
+        destination: destinationCity,
+        departure_date: convertDateFormat(departureDate),
       },
       {
-        origin: "SDQ",
-        destination: "JFK",
-        departure_date: "2023-12-31",
+        origin: destinationCity,
+        destination: originCity,
+        departure_date: convertDateFormat(returnDate),
       },
     ],
     passengers: [{ type: "adult" }, { type: "adult" }, { age: 1 }],
     cabin_class: "business",
   });
 
-  let results = [];
+  if (!Array.isArray(apiRes.data.offers) || apiRes.data.offers.length === 0) {
+    return [];
+  }
 
-  apiRes.data.offers.forEach((item) => {
-    const totalEmissionsKg = item.total_emissions_kg;
-    const totalAmount = item.total_amount;
-    const currency = item.total_currency;
+  // Extract relevant information from each booking
+  const extractedInfo = apiRes.data.offers.map((booking) => {
+    const { total_amount, total_currency, slices } = booking;
 
-    item.slices.forEach((slice) => {
-      slice.segments.forEach((segment) => {
-        let details = {
-          total_emissions_kg: totalEmissionsKg,
-          total_amount: totalAmount,
-          currency: currency,
-          arriving_at: segment.arriving_at,
-          flight_duration: segment.duration,
-          destination: segment.destination,
-          origin: segment.origin,
-          operating_carrier: {
-            name: segment.operating_carrier.name,
-            logo_symbol_url: segment.operating_carrier.logo_symbol_url,
-          },
-          operating_carrier_flight_number:
-            segment.operating_carrier_flight_number,
-          cabin_class_marketing_name:
-            segment.passengers && segment.passengers.length > 0
-              ? segment.passengers[0].cabin_class_marketing_name
-              : "",
-        };
-        results.push(details);
-      });
-    });
+    // Return the entire slice object
+    return {
+      total_amount,
+      total_currency,
+      slices,
+    };
   });
 
-  response.send(apiRes.data.offers);
+  response.send(extractedInfo);
 });
 
 export default router;
