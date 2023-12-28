@@ -1,37 +1,14 @@
 "use client";
 // FlightBooking.js
-import useSWR from "swr";
-import React, { useState } from "react";
+import useSWRMutation from "swr/mutation";
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { create } from "domain";
 import FlightCard from "../components/flightCard";
-
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
-function getData(url) {
-  const { data, error } = useSWR("url", fetcher);
-  return {
-    data: data,
-    error: error,
-  };
-}
-
-const createApiUrl = ({
-  originCity,
-  destinationCity,
-  departureDate,
-  returnDate,
-}) => {
-  const baseUrl = "http://localhost:9000/api/v1/";
-
-  // Constructing the URL with query parameters
-  const apiUrl = `${baseUrl}?originCity=${originCity}&destinationCity=${destinationCity}&departureDate=${departureDate}&returnDate=${returnDate}`;
-
-  return apiUrl;
-};
+import createEndPointURL from "../utils/createEndPointURL";
+import fetcher from "../utils/fetcher";
 
 const FlightBooking = () => {
-  const [shouldFetch, setShouldFetch] = React.useState(false);
   const [tripType, setTripType] = useState("oneWay");
   const [cabinClass, setCabinClass] = useState("economy");
   const [numAdults, setNumAdults] = useState(1);
@@ -41,13 +18,13 @@ const FlightBooking = () => {
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
 
-  const endpointURL = createApiUrl({
+  const endpointURL = createEndPointURL({
     originCity,
     destinationCity,
     departureDate,
     returnDate,
   });
-  const { data } = useSWR(shouldFetch ? endpointURL : null, fetcher);
+  const { data, trigger } = useSWRMutation(endpointURL, fetcher);
 
   const handleTripTypeChange = (e) => {
     setTripType(e.target.value);
@@ -95,7 +72,7 @@ const FlightBooking = () => {
   };
 
   const handleSearchFlight = () => {
-    setShouldFetch(true);
+    trigger();
   };
 
   return (
