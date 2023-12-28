@@ -5,8 +5,9 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { create } from "domain";
+import FlightCard from "../components/flightCard";
 
-const fetcher = (...args) => fetch(...args).then((res) => res.text());
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 function getData(url) {
   const { data, error } = useSWR("url", fetcher);
   return {
@@ -39,6 +40,7 @@ const FlightBooking = () => {
   const [destinationCity, setDestinationCity] = useState("");
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
+
   const endpointURL = createApiUrl({
     originCity,
     destinationCity,
@@ -243,134 +245,11 @@ const FlightBooking = () => {
           </button>
         </div>
       </div>
-      <label
-        className="itinerary-card"
-        for="travel-items-toggle-off_0000AdBgie6kU5uz7chOPv_0-arp_jfk_us"
-      >
-        <input
-          className="itinerary-card__hidden-toggle"
-          type="checkbox"
-          id="travel-items-toggle-off_0000AdBgie6kU5uz7chOPv_0-arp_jfk_us"
-        />
-        <div className="itinerary-card__header">
-          <div className="itinerary-card__header-info">
-            <div className="itinerary-card__carrier-info">
-              <img
-                className="airline-logo"
-                src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/IB.svg"
-                alt="Logo for airline"
-                onerror="handleAirlineLogoError(this, 'IB')"
-                id="travel-items-toggle-off_0000AdBgie6kU5uz7chOPv_0-arp_jfk_us-IB-logo"
-                phx-update="ignore"
-              />
-
-              <span className="itinerary-card__carriers">
-                <span className="itinerary-card__marketing_carriers">
-                  Iberia
-                </span>
-                <span className="itinerary-card__operating_carriers--mobile"></span>
-              </span>
-            </div>
-
-            <div className="itinerary-card__baggage">
-              <span className="itinerary-card__toggle-icon"></span>
-            </div>
-          </div>
-          <div className="flight-path">
-            <div className="flight-path__origin">
-              <p className="flight-path__info-time">20:54</p>
-              <p className="flight-path__info-place">JFK</p>
-            </div>
-            <div className="flight-path__line-wrapper">
-              <div className="flight-path__flight-path-representation">
-                <p className="flight-path__info-duration">5h 52m</p>
-                <div>
-                  <div className="flight-path__flight-line"></div>
-                </div>
-
-                <p className="flight-path__info-stops">Non-stop</p>
-              </div>
-              <div className="flight-path__plane-symbol">
-                <span className="material-symbols-outlined">flight</span>
-              </div>
-            </div>
-            <div className="flight-path__flight-destination">
-              <p className="flight-path__info-time">
-                23:46
-                <sup></sup>
-              </p>
-              <p className="flight-path__info-place">LAX</p>
-            </div>
-          </div>
-        </div>
-        <div className="itinerary-card__travel-items itinerary-card__travel-items--with-footer">
-          <div className="itinerary-card__travel-item itinerary-card__travel-item--departure">
-            <div></div>
-            <span className="material-symbols-outlined">calendar_month</span>
-            <p>Thursday, 28 December 2023</p>
-          </div>
-
-          <div className="itinerary-card__travel-item itinerary-card__travel-item--origin">
-            <p>20:54</p>
-            <span className="material-symbols-outlined">flight_takeoff</span>
-            <p>Depart from John F. Kennedy International Airport (JFK)</p>
-          </div>
-
-          <div className="itinerary-card__travel-item itinerary-card__travel-item--segment-info">
-            <div></div>
-            <div></div>
-            <p>
-              5h 52m
-              <span>•</span>
-              <img
-                className="airline-logo--small"
-                src="https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/IB.svg"
-                alt="Logo for Iberia"
-                onerror="handleAirlineLogoError(this, 'IB')"
-                id="logo-John F. Kennedy International Airport (JFK)-Iberia-off_0000AdBgie6kU5uz7chOPv_0-arp_jfk_us"
-                phx-update="ignore"
-              />
-              Iberia
-              <span>•</span>
-              Airbus A330-200
-              <span>•</span>
-              IB3179
-              <span>•</span>
-              Economy
-            </p>
-          </div>
-
-          <div className="itinerary-card__travel-item itinerary-card__travel-item--destination">
-            <p>23:46</p>
-            <span className="material-symbols-outlined">flight_land</span>
-            <p>Arrive at Los Angeles International Airport (LAX)</p>
-          </div>
-
-          <div className="itinerary-card__travel-item itinerary-card__travel-item--arrival">
-            <div></div>
-            <span className="material-symbols-outlined">calendar_month</span>
-            <p>Thursday, 28 December 2023</p>
-          </div>
-        </div>
-
-        <div className="itinerary-card__footer">
-          <div>
-            <p className="itinerary-card__price">
-              <span>From</span>
-              US$392
-            </p>
-          </div>
-          <a
-            href="/results?adults=1&amp;cabin_class=economy&amp;checksum=1578122832&amp;departure_date[]=2023-12-28&amp;departure_date[]=2023-12-31&amp;destination[]=LAX&amp;destination[]=JFK&amp;origin[]=JFK&amp;origin[]=LAX&amp;partial_offer_request_id=prq_0000AdBgidvPAGqOYROKjQ&amp;selected_offer_id[]=off_0000AdBgie6kU5uz7chOPv_0"
-            data-phx-link="redirect"
-            data-phx-link-state="push"
-            className="button button--primary"
-          >
-            Select
-          </a>
-        </div>
-      </label>
-      <div>{!data ? "walled eats butt" : data}</div>
+      {data ? (
+        data.map((item) => <FlightCard offer={item} />)
+      ) : (
+        <div>sdfsdf</div>
+      )}
     </div>
   );
 };
