@@ -2,19 +2,29 @@ import express from "express";
 import cors from "cors";
 import { MongoClient, ServerApiVersion } from "mongodb";
 import travelRoutes from "./routes/travelRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import mongoose from "mongoose";
 const uri =
   "mongodb+srv://testAccount:MongoDBTest@onetravel.xjdjam6.mongodb.net/?retryWrites=true&w=majority";
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:3000",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
 app.use("/api/v1", travelRoutes);
+app.use("/api/v1", postRoutes);
+app.use("/api/v1", userRoutes);
 
 const client = new MongoClient(uri, {
   serverApi: {

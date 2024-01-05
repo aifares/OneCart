@@ -7,6 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import FlightCard from "../components/flightCard";
 import createEndPointURL from "../utils/createEndPointURL";
 import fetcher from "../utils/fetcher";
+import Select from "react-select";
 
 const FlightBooking = () => {
   const [tripType, setTripType] = useState("oneWay");
@@ -24,7 +25,17 @@ const FlightBooking = () => {
     departureDate,
     returnDate,
   });
+  const [input, setInput] = useState("");
+  const [options, setOptions] = useState([]);
   const { data, trigger } = useSWRMutation(endpointURL, fetcher);
+  const {
+    data: searchData,
+    trigger: tr,
+    isMutating: isLoading,
+  } = useSWRMutation(
+    `http://localhost:9000/api/v1/searchAirport?input=${input}`,
+    fetcher
+  );
 
   const handleTripTypeChange = (e) => {
     setTripType(e.target.value);
@@ -71,6 +82,22 @@ const FlightBooking = () => {
     setReturnDate(formattedDate);
   };
 
+  useEffect(() => {
+    input && tr();
+    setOptions(searchData);
+  }, [input]);
+
+  useEffect(() => {
+    setOptions(searchData);
+  }, [searchData]);
+
+  const handleInputChange = (newValue) => {
+    setInput(newValue);
+    console.log("Input value:", newValue);
+  };
+
+  const noOptionsMessage = () => "No options found";
+
   const handleSearchFlight = () => {
     trigger();
   };
@@ -79,6 +106,12 @@ const FlightBooking = () => {
     <div className="container mx-auto mt-8">
       <h2 className="text-2xl font-bold mb-4">Flight Booking</h2>
       <div className="flex space-x-4">
+        <Select
+          filterOption={() => true} // Let the local options handle filtering
+          noOptionsMessage={noOptionsMessage}
+          options={options}
+          onInputChange={handleInputChange}
+        />
         <div className="w-1/4">
           <label
             htmlFor="tripType"

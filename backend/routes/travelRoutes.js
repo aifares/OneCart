@@ -1,6 +1,8 @@
 import express from "express";
 const router = express.Router();
 import { Duffel } from "@duffel/api";
+import airportCodes from "./airportCodes.json" assert { type: "json" };
+import Fuse from "fuse.js";
 
 const duffel = new Duffel({
   token: "duffel_test_PTGHpqlDC118HrhOMGnPDNRU-DVCwLZFuqriClIn1i9",
@@ -55,6 +57,26 @@ router.get("/", async (request, response) => {
   });
 
   response.send(extractedInfo);
+});
+
+router.get("/searchAirport", async (request, response) => {
+  const fuseOptions = {
+    keys: ["label"], // Specify the key(s) to search on
+    threshold: 0.1, // Adjust the threshold according to your needs
+    distance: 0,
+    findAllMatches: true,
+  };
+
+  const fuse = new Fuse(airportCodes, fuseOptions);
+
+  const { input } = request.query;
+
+  if (!input) {
+    return response.status(400).json({ error: 'Missing query parameter "q".' });
+  }
+
+  const searchResults = fuse.search(input).map((result) => result.item);
+  response.json(searchResults);
 });
 
 export default router;
