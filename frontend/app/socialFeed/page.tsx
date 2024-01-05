@@ -23,7 +23,7 @@ const SocialFeed = ({}) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ author, body, title }), // Assuming your server expects an object with 'author' and 'body' properties
+        body: JSON.stringify({ author, body, title }),
       });
 
       if (!response.ok) {
@@ -32,12 +32,18 @@ const SocialFeed = ({}) => {
 
       const result = await response.json();
       // Log the response from the server
+      console.log("Post successful:", result);
+
+      // Return the response so it can be accessed in the calling function
+      return result;
     } catch (error) {
       console.error("Error:", error.message);
+      // If there's an error, return a default value (e.g., null)
+      return null;
     }
   };
 
-  const { data, trigger } = useSWRMutation(
+  const { data, trigger, isMutating } = useSWRMutation(
     `http://localhost:9000/api/v1/getAllPosts`,
     fetcher
   );
@@ -52,13 +58,34 @@ const SocialFeed = ({}) => {
     setNewPost({ ...newPost, [e.target.name]: e.target.value });
   };
 
-  const handleNewPostSubmit = (e) => {
+  const handleNewPostSubmit = async (e) => {
     e.preventDefault();
-    postData({
-      author: session.data?.user?.email,
-      title: newPost.title,
-      body: newPost.content,
-    }).then(() => trigger());
+
+    try {
+      // Post new data and wait for the response
+      const res = await postData({
+        author: session.data?.user?.email,
+        title: newPost.title,
+        body: newPost.content,
+      });
+
+      // Check if the response is okay
+      if (res) {
+        // Log the successful response
+        console.log("Post created successfully:", res);
+
+        // Trigger a re-fetch of the posts
+        trigger();
+      } else {
+        console.error("Post creation response is undefined.");
+      }
+    } catch (error) {
+      // Log any unexpected errors
+      console.error("Error submitting new post:", error.message);
+    }
+
+    // Clear the new post input
+    setNewPost({ title: "", content: "" });
   };
 
   return (
@@ -89,13 +116,10 @@ const SocialFeed = ({}) => {
       >
         Submit Post
       </button>
-      {data &&
-        data.map((post) => (
-          <Post
-            title={post?.title || "No Title"}
-            body={post?.body || "No Body"}
-          />
-        ))}
+
+      {!isMutating
+        ? data && data.map((post) => <Post data={post} />)
+        : "Data Loading"}
     </div>
   );
 };

@@ -30,4 +30,27 @@ router.get("/getAllPosts", async (req, res) => {
     res.status(500).send(error.message);
   }
 });
+
+router.patch("/addComment", async (req, res) => {
+  const postId = req.body.postId;
+  const postComment = req.body.postComment;
+
+  try {
+    // Find the post by ID and update the comments list
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      { $push: { comments: postComment } },
+      { new: true } // Returns the updated document
+    );
+
+    if (!updatedPost) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    return res.json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 export default router;
